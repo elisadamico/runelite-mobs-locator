@@ -18,6 +18,7 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import static net.runelite.api.widgets.ComponentID.WORLD_MAP_VIEW;
 
 public class MobsLocatorOverlay extends Overlay
 {
@@ -53,7 +54,7 @@ public class MobsLocatorOverlay extends Overlay
 
         plugin.hasSearchTermChanged();
 
-        Widget worldMap = client.getWidget(WidgetInfo.WORLD_MAP_VIEW);
+        Widget worldMap = client.getWidget(ComponentID.WORLD_MAP_VIEW);
         if (worldMap != null && !worldMap.isHidden())
         {
             return null;
