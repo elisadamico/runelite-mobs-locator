@@ -40,8 +40,12 @@ public class MobsLocatorPlugin extends Plugin
     private MobsLocatorMinimapOverlay minimapOverlay;
 
     @Inject
-    private MobsLocatorWorldMapOverlay worldMapOverlay;
+        private MobsLocatorWorldMapOverlay worldMapOverlay;
 
+     @Inject
+        private com.google.gson.Gson gson;
+
+        
     private final Set<NPC> trackedNPCs = new HashSet<>();
     private final Map<String, List<NPC>> mobsByName = new HashMap<>();
     private final Map<String, Map<WorldPoint, Integer>> mobLocationCounts = new HashMap<>();
@@ -251,5 +255,10 @@ public class MobsLocatorPlugin extends Plugin
     MobsLocatorConfig provideConfig(ConfigManager configManager)
     {
         return configManager.getConfig(MobsLocatorConfig.class);
+    }
+
+    public com.google.gson.Gson getGson()
+    {
+        return gson;
     }
 }
