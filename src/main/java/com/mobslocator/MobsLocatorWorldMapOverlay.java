@@ -21,12 +21,14 @@ public class MobsLocatorWorldMapOverlay extends Overlay
 {
     private final MobsLocatorConfig config;
     private final WorldMapOverlay worldMapOverlay;
-
+    private final MobsLocatorPlugin plugin;  // ADD THIS LINE
+    
     @Inject
-    public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay)
+    public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay, MobsLocatorPlugin plugin)  // ADD plugin parameter
     {
         this.config = config;
         this.worldMapOverlay = worldMapOverlay;
+        this.plugin = plugin;  // ADD THIS LINE
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(OverlayPriority.HIGH);
