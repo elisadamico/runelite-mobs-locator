@@ -17,8 +17,6 @@ import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-Widget worldMap = client.getWidget(595, 25);
 
 public class MobsLocatorOverlay extends Overlay
 {
