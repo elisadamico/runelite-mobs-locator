@@ -268,14 +268,7 @@ public class MobSpawnData
         return matchingSpawns;
     }
 
-    public static Set<String> getAllMobNames()
-    {
-        if (!initialized)
-        {
-            initialize();
-        }
-        return new HashSet<>(MOB_SPAWNS.keySet());
-    }
+   
 
     private static class Region
     {
