@@ -16,14 +16,16 @@ public class MobSpawnData
     private static final List<Region> REGIONS = new ArrayList<>();
     private static final int CLUSTER_DISTANCE = 50;
     private static boolean initialized = false;
+    private static Gson gson;
 
-    public static synchronized void initialize()
+    public static synchronized void initialize(Gson gsonInstance)
     {
         if (initialized)
         {
             return;
         }
 
+        gson = gsonInstance;
         loadRegions();
         loadSpawnData();
         initialized = true;
@@ -47,14 +49,12 @@ public class MobSpawnData
                 System.err.println("Could not find " + filename + " resource");
                 return;
             }
-
-            Gson gson = new Gson();
             JsonArray jsonArray = gson.fromJson(new InputStreamReader(inputStream), JsonArray.class);
 
             for (JsonElement element : jsonArray)
             {
                 JsonObject obj = element.getAsJsonObject();
-
+                
                 if (!obj.has("name") || !obj.has("bounds"))
                 {
                     continue;
@@ -62,7 +62,7 @@ public class MobSpawnData
 
                 String name = obj.get("name").getAsString();
                 JsonArray boundsArray = obj.getAsJsonArray("bounds");
-
+                
                 if (boundsArray.size() != 2)
                 {
                     continue;
@@ -96,16 +96,14 @@ public class MobSpawnData
                 System.err.println("Could not find npc_spawns.json resource");
                 return;
             }
-
-            Gson gson = new Gson();
             JsonArray jsonArray = gson.fromJson(new InputStreamReader(inputStream), JsonArray.class);
-
+            
             Map<String, List<NpcSpawn>> rawSpawnsByName = new HashMap<>();
 
             for (JsonElement element : jsonArray)
             {
                 JsonObject obj = element.getAsJsonObject();
-
+                
                 if (!obj.has("name") || !obj.has("x") || !obj.has("y") || !obj.has("p"))
                 {
                     continue;
@@ -118,16 +116,16 @@ public class MobSpawnData
                 int plane = obj.get("p").getAsInt();
 
                 WorldPoint worldPoint = new WorldPoint(x, y, plane);
-
+                
                 rawSpawnsByName.computeIfAbsent(name.toLowerCase(), k -> new ArrayList<>())
-                        .add(new NpcSpawn(worldPoint, name));
+                    .add(new NpcSpawn(worldPoint, name));
             }
 
             for (Map.Entry<String, List<NpcSpawn>> entry : rawSpawnsByName.entrySet())
             {
                 String mobName = entry.getKey();
                 List<NpcSpawn> spawns = entry.getValue();
-
+                
                 List<SpawnLocation> clusterLocations = clusterSpawns(spawns);
                 MOB_SPAWNS.put(mobName, clusterLocations);
             }
@@ -168,13 +166,13 @@ public class MobSpawnData
         }
 
         return clusters.stream()
-                .map(cluster -> new SpawnLocation(
-                        getAreaName(cluster.getCenter()),
-                        cluster.getCount(),
-                        cluster.getCenter(),
-                        isMembersArea(cluster.getCenter())
-                ))
-                .collect(Collectors.toList());
+            .map(cluster -> new SpawnLocation(
+                getAreaName(cluster.getCenter()),
+                cluster.getCount(),
+                cluster.getCenter(),
+                isMembersArea(cluster.getCenter())
+            ))
+            .collect(Collectors.toList());
     }
 
     private static String getAreaName(WorldPoint point)
@@ -201,10 +199,10 @@ public class MobSpawnData
 
         for (Region region : REGIONS)
         {
-            if (region.name.equals("Gielinor Surface") ||
-                    region.name.contains("Dungeon") ||
-                    region.name.contains("Cave") ||
-                    region.name.contains("Underground"))
+            if (region.name.equals("Gielinor Surface") || 
+                region.name.contains("Dungeon") || 
+                region.name.contains("Cave") || 
+                region.name.contains("Underground"))
             {
                 continue;
             }
@@ -240,22 +238,22 @@ public class MobSpawnData
         return true;
     }
 
-    public static List<SpawnLocation> getSpawnLocations(String mobName)
+    public static List<SpawnLocation> getSpawnLocations(String mobName, Gson gsonInstance)
     {
         if (!initialized)
         {
-            initialize();
+            initialize(gsonInstance);
         }
-
+        
         String searchTerm = mobName.toLowerCase().trim();
         System.out.println("Searching for: '" + searchTerm + "'");
-
+        
         if (MOB_SPAWNS.containsKey(searchTerm))
         {
             System.out.println("Found exact match for: " + searchTerm);
             return MOB_SPAWNS.get(searchTerm);
         }
-
+        
         List<SpawnLocation> matchingSpawns = new ArrayList<>();
         for (Map.Entry<String, List<SpawnLocation>> entry : MOB_SPAWNS.entrySet())
         {
@@ -265,7 +263,7 @@ public class MobSpawnData
                 matchingSpawns.addAll(entry.getValue());
             }
         }
-
+        
         System.out.println("Total matches found: " + matchingSpawns.size());
         return matchingSpawns;
     }
