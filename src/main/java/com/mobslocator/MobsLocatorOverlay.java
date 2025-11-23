@@ -54,7 +54,8 @@ public class MobsLocatorOverlay extends Overlay
 
         plugin.hasSearchTermChanged();
 
-        Widget worldMap = client.getWidget(ComponentID.WORLD_MAP_VIEW);
+        //Widget worldMap = client.getWidget(ComponentID.WORLD_MAP_VIEW);
+        Widget worldMap = client.getWidget(595, 25);  // World map widget
         if (worldMap != null && !worldMap.isHidden())
         {
             return null;
