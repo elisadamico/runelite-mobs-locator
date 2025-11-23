@@ -79,7 +79,7 @@ public class MobsLocatorOverlay extends Overlay
         rightPanel.getChildren().clear();
         rightPanel.setPreferredSize(new Dimension(90, 0));
 
-        List<MobSpawnData.SpawnLocation> knownSpawns = MobSpawnData.getSpawnLocations(searchedMob.toLowerCase());
+        List<MobSpawnData.SpawnLocation> knownSpawns = MobSpawnData.getSpawnLocations(searchedMob.toLowerCase(), plugin.getGson());
 
         leftPanel.getChildren().add(TitleComponent.builder()
                 .text("All Locations")
