@@ -41,7 +41,7 @@ public class MobsLocatorWorldMapOverlay extends Overlay
             return null;
         }
 
-        List<MobSpawnData.SpawnLocation> spawnLocations = MobSpawnData.getSpawnLocations(searchedMob);
+        List<MobSpawnData.SpawnLocation> spawnLocations = MobSpawnData.getSpawnLocations(searchedMob, plugin.getGson());
         if (spawnLocations.isEmpty())
         {
             return null;
