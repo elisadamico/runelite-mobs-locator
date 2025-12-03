@@ -5,13 +5,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.runelite.api.coords.WorldPoint;
-import lombok.extern.slf4j.Slf4j;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 public class MobSpawnData
 {
     private static final Map<String, List<SpawnLocation>> MOB_SPAWNS = new HashMap<>();
@@ -38,7 +36,7 @@ public class MobSpawnData
         loadRegionsFromFile("/surface_areas.json");
         loadRegionsFromFile("/regions.json");
         REGIONS.sort((a, b) -> Integer.compare(a.getArea(), b.getArea()));
-        log.info("Loaded {} region definitions", REGIONS.size());
+        System.out.println("Loaded " + REGIONS.size() + " region definitions");
     }
 
     private static void loadRegionsFromFile(String filename)
@@ -48,7 +46,7 @@ public class MobSpawnData
             InputStream inputStream = MobSpawnData.class.getResourceAsStream(filename);
             if (inputStream == null)
             {
-                log.error("Could not find {} resource", filename);
+                System.err.println("Could not find " + filename + " resource");
                 return;
             }
             JsonArray jsonArray = gson.fromJson(new InputStreamReader(inputStream), JsonArray.class);
@@ -83,7 +81,8 @@ public class MobSpawnData
         }
         catch (Exception e)
         {
-            log.error("Error loading {}", filename, e);
+            System.err.println("Error loading " + filename + ": " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -94,7 +93,7 @@ public class MobSpawnData
             InputStream inputStream = MobSpawnData.class.getResourceAsStream("/npc_spawns.json");
             if (inputStream == null)
             {
-                log.error("Could not find npc_spawns.json resource");
+                System.err.println("Could not find npc_spawns.json resource");
                 return;
             }
             JsonArray jsonArray = gson.fromJson(new InputStreamReader(inputStream), JsonArray.class);
@@ -131,11 +130,12 @@ public class MobSpawnData
                 MOB_SPAWNS.put(mobName, clusterLocations);
             }
 
-            log.info("Loaded spawn data for {} different mobs", MOB_SPAWNS.size());
+            System.out.println("Loaded spawn data for " + MOB_SPAWNS.size() + " different mobs");
         }
         catch (Exception e)
         {
-            log.error("Error loading NPC spawn data", e);
+            System.err.println("Error loading NPC spawn data: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -246,11 +246,11 @@ public class MobSpawnData
         }
         
         String searchTerm = mobName.toLowerCase().trim();
-        log.debug("Searching for: '{}'", searchTerm);
+        System.out.println("Searching for: '" + searchTerm + "'");
         
         if (MOB_SPAWNS.containsKey(searchTerm))
         {
-            log.debug("Found exact match for: {}", searchTerm);
+            System.out.println("Found exact match for: " + searchTerm);
             return MOB_SPAWNS.get(searchTerm);
         }
         
@@ -259,23 +259,16 @@ public class MobSpawnData
         {
             if (entry.getKey().contains(searchTerm))
             {
-                log.debug("Found partial match: {}", entry.getKey());
+                System.out.println("Found partial match: " + entry.getKey());
                 matchingSpawns.addAll(entry.getValue());
             }
         }
         
-        log.debug("Total matches found: {}", matchingSpawns.size());
+        System.out.println("Total matches found: " + matchingSpawns.size());
         return matchingSpawns;
     }
 
-    public static Set<String> getAllMobNames()
-    {
-        if (!initialized)
-        {
-            initialize();
-        }
-        return new HashSet<>(MOB_SPAWNS.keySet());
-    }
+   
 
     private static class Region
     {
