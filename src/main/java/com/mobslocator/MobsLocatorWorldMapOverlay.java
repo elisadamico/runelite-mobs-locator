@@ -27,7 +27,9 @@ public class MobsLocatorWorldMapOverlay extends Overlay
     public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay)
     {
         this.config = config;
-        this.worldMapOverlay = worldMapOverlay;
+        this.worldMapOverlay = worldMapOverlay; 
+        this.plugin = plugin;  // ADD THIS LINE
+
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(OverlayPriority.HIGH);
