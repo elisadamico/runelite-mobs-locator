@@ -21,14 +21,12 @@ public class MobsLocatorWorldMapOverlay extends Overlay
 {
     private final MobsLocatorConfig config;
     private final WorldMapOverlay worldMapOverlay;
-    private final MobsLocatorPlugin plugin;  // ADD THIS LINE
-    
+
     @Inject
-    public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay, MobsLocatorPlugin plugin)  // ADD plugin parameter
+    public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay)
     {
         this.config = config;
         this.worldMapOverlay = worldMapOverlay;
-        this.plugin = plugin;  // ADD THIS LINE
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setPriority(OverlayPriority.HIGH);
@@ -43,7 +41,7 @@ public class MobsLocatorWorldMapOverlay extends Overlay
             return null;
         }
 
-        List<MobSpawnData.SpawnLocation> spawnLocations = MobSpawnData.getSpawnLocations(searchedMob, plugin.getGson());
+        List<MobSpawnData.SpawnLocation> spawnLocations = MobSpawnData.getSpawnLocations(searchedMob);
         if (spawnLocations.isEmpty())
         {
             return null;
@@ -53,10 +51,16 @@ public class MobsLocatorWorldMapOverlay extends Overlay
 
         int screenWidth = graphics.getClipBounds().width;
         int screenHeight = graphics.getClipBounds().height;
-        int leftMargin = 250;
-        int rightMargin = screenWidth - 50;
-        int topMargin = 50;
-        int bottomMargin = screenHeight - 50;
+        int leftMargin = 260;
+        int rightMargin = screenWidth - 60;
+        int topMargin = 60;
+        int bottomMargin = screenHeight - 60;
+
+        // Lists to hold off-screen locations by direction
+        java.util.List<MobSpawnData.SpawnLocation> offScreenNorth = new java.util.ArrayList<>();
+        java.util.List<MobSpawnData.SpawnLocation> offScreenSouth = new java.util.ArrayList<>();
+        java.util.List<MobSpawnData.SpawnLocation> offScreenEast = new java.util.ArrayList<>();
+        java.util.List<MobSpawnData.SpawnLocation> offScreenWest = new java.util.ArrayList<>();
 
         for (MobSpawnData.SpawnLocation spawn : spawnLocations)
         {
@@ -71,8 +75,8 @@ public class MobsLocatorWorldMapOverlay extends Overlay
             int x = mapPoint.getX();
             int y = mapPoint.getY();
 
-            boolean isOnScreen = x >= leftMargin && x <= rightMargin &&
-                    y >= topMargin && y <= bottomMargin;
+            boolean isOnScreen = x >= leftMargin && x <= rightMargin && 
+                                 y >= topMargin && y <= bottomMargin;
 
             if (isOnScreen)
             {
@@ -101,80 +105,130 @@ public class MobsLocatorWorldMapOverlay extends Overlay
             }
             else
             {
-                drawDirectionalArrow(graphics, x, y, leftMargin, rightMargin, topMargin, bottomMargin, hotPink);
+                // Categorize by primary direction
+                int centerX = (leftMargin + rightMargin) / 2;
+                int centerY = (topMargin + bottomMargin) / 2;
+                int dx = x - centerX;
+                int dy = y - centerY;
+
+                // Determine primary direction based on which axis has larger offset
+                if (Math.abs(dx) > Math.abs(dy))
+                {
+                    if (dx < 0)
+                        offScreenWest.add(spawn);
+                    else
+                        offScreenEast.add(spawn);
+                }
+                else
+                {
+                    if (dy < 0)
+                        offScreenNorth.add(spawn);
+                    else
+                        offScreenSouth.add(spawn);
+                }
             }
+        }
+
+        // Draw consolidated arrows for each direction
+        if (!offScreenNorth.isEmpty())
+        {
+            int arrowX = (leftMargin + rightMargin) / 2;
+            int arrowY = topMargin + 20;
+            drawArrowWithCount(graphics, arrowX, arrowY, -Math.PI / 2, 20, hotPink, offScreenNorth.size());
+        }
+        if (!offScreenSouth.isEmpty())
+        {
+            int arrowX = (leftMargin + rightMargin) / 2;
+            int arrowY = bottomMargin - 20;
+            drawArrowWithCount(graphics, arrowX, arrowY, Math.PI / 2, 20, hotPink, offScreenSouth.size());
+        }
+        if (!offScreenEast.isEmpty())
+        {
+            int arrowX = rightMargin - 20;
+            int arrowY = (topMargin + bottomMargin) / 2;
+            drawArrowWithCount(graphics, arrowX, arrowY, 0, 20, hotPink, offScreenEast.size());
+        }
+        if (!offScreenWest.isEmpty())
+        {
+            int arrowX = leftMargin + 20;
+            int arrowY = (topMargin + bottomMargin) / 2;
+            drawArrowWithCount(graphics, arrowX, arrowY, Math.PI, 20, hotPink, offScreenWest.size());
         }
 
         return null;
     }
 
-    private void drawDirectionalArrow(Graphics2D graphics, int targetX, int targetY,
-                                      int leftMargin, int rightMargin, int topMargin, int bottomMargin,
-                                      Color color)
+    private void drawArrowWithCount(Graphics2D graphics, int x, int y, double angle, int size, Color color, int count)
     {
-        int centerX = (leftMargin + rightMargin) / 2;
-        int centerY = (topMargin + bottomMargin) / 2;
-
-        double dx = targetX - centerX;
-        double dy = targetY - centerY;
-        double angle = Math.atan2(dy, dx);
-
-        int arrowX, arrowY;
-
-        double slope = dy / dx;
-
-        if (Math.abs(dx) > Math.abs(dy))
+        drawArrow(graphics, x, y, angle, size, color);
+        
+        // Draw count badge
+        if (count > 1)
         {
-            if (targetX < leftMargin)
-            {
-                arrowX = leftMargin + 30;
-                arrowY = (int) (centerY + (arrowX - centerX) * slope);
-            }
-            else
-            {
-                arrowX = rightMargin - 30;
-                arrowY = (int) (centerY + (arrowX - centerX) * slope);
-            }
-            arrowY = Math.max(topMargin + 30, Math.min(bottomMargin - 30, arrowY));
+            graphics.setFont(graphics.getFont().deriveFont(java.awt.Font.BOLD, 14f));
+            String countStr = String.valueOf(count);
+            FontMetrics fm = graphics.getFontMetrics();
+            int textWidth = fm.stringWidth(countStr);
+            
+            int badgeX = x + 15;
+            int badgeY = y - 15;
+            int badgeSize = Math.max(20, textWidth + 8);
+            
+            // Draw circle background
+            graphics.setColor(new Color(0, 0, 0, 200));
+            graphics.fillOval(badgeX - badgeSize/2, badgeY - badgeSize/2, badgeSize, badgeSize);
+            
+            // Draw circle border
+            graphics.setColor(color);
+            graphics.setStroke(new java.awt.BasicStroke(2));
+            graphics.drawOval(badgeX - badgeSize/2, badgeY - badgeSize/2, badgeSize, badgeSize);
+            
+            // Draw count text
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(countStr, badgeX - textWidth/2, badgeY + fm.getAscent()/2 - 2);
         }
-        else
-        {
-            if (targetY < topMargin)
-            {
-                arrowY = topMargin + 30;
-                arrowX = (int) (centerX + (arrowY - centerY) / slope);
-            }
-            else
-            {
-                arrowY = bottomMargin - 30;
-                arrowX = (int) (centerX + (arrowY - centerY) / slope);
-            }
-            arrowX = Math.max(leftMargin + 30, Math.min(rightMargin - 30, arrowX));
-        }
-
-        drawArrow(graphics, arrowX, arrowY, angle, 20, color);
     }
 
     private void drawArrow(Graphics2D graphics, int x, int y, double angle, int size, Color color)
     {
+        // Save original transform
+        java.awt.geom.AffineTransform oldTransform = graphics.getTransform();
+        
+        // Rotate around the arrow position
+        graphics.rotate(angle, x, y);
+        
+        // Draw arrow stem (rectangle)
+        int stemWidth = size / 3;
+        int stemHeight = (int)(size * 1.2);
+        graphics.setColor(color);
+        graphics.fillRect(x - stemWidth / 2, y - stemHeight, stemWidth, stemHeight);
+        
+        // Draw arrow head (triangle)
         int[] xPoints = new int[3];
         int[] yPoints = new int[3];
-
-        xPoints[0] = x + (int) (size * Math.cos(angle));
-        yPoints[0] = y + (int) (size * Math.sin(angle));
-
-        xPoints[1] = x + (int) (size * 0.4 * Math.cos(angle + 2.5));
-        yPoints[1] = y + (int) (size * 0.4 * Math.sin(angle + 2.5));
-
-        xPoints[2] = x + (int) (size * 0.4 * Math.cos(angle - 2.5));
-        yPoints[2] = y + (int) (size * 0.4 * Math.sin(angle - 2.5));
-
-        graphics.setColor(color);
+        
+        int headWidth = (int)(size * 0.8);
+        int headHeight = (int)(size * 0.6);
+        
+        xPoints[0] = x; // tip
+        yPoints[0] = y;
+        
+        xPoints[1] = x - headWidth / 2; // left
+        yPoints[1] = y - headHeight;
+        
+        xPoints[2] = x + headWidth / 2; // right
+        yPoints[2] = y - headHeight;
+        
         graphics.fillPolygon(xPoints, yPoints, 3);
-
+        
+        // Draw black outline
         graphics.setColor(Color.BLACK);
         graphics.setStroke(new java.awt.BasicStroke(2));
+        graphics.drawRect(x - stemWidth / 2, y - stemHeight, stemWidth, stemHeight);
         graphics.drawPolygon(xPoints, yPoints, 3);
+        
+        // Restore original transform
+        graphics.setTransform(oldTransform);
     }
 
     // Helper method to draw a star
