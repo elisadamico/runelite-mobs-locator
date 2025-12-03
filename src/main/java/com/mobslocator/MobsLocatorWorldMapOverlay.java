@@ -24,7 +24,7 @@ public class MobsLocatorWorldMapOverlay extends Overlay
     private final MobsLocatorPlugin plugin;  // ADD THIS LINE
 
     @Inject
-    public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay)
+    public MobsLocatorWorldMapOverlay(MobsLocatorConfig config, WorldMapOverlay worldMapOverlay, MobsLocatorPlugin plugin)
     {
         this.config = config;
         this.worldMapOverlay = worldMapOverlay; 
