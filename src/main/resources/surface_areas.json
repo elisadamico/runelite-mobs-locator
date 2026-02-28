@@ -218,5 +218,24 @@
 
   {"name": "Between Lumbridge and Varrock", "bounds": [[3230, 3260], [3270, 3320]]},
   {"name": "Between Varrock and Edgeville", "bounds": [[3090, 3440], [3130, 3480]]},
-  {"name": "Between Falador and Barbarian Village", "bounds": [[3050, 3360], [3090, 3400]]}
+  {"name": "Between Falador and Barbarian Village", "bounds": [[3050, 3360], [3090, 3400]]},
+
+  {"name": "Civitas illa Fortis", "bounds": [[1600, 2880], [1750, 3000]]},
+  {"name": "Fortis Grand Museum", "bounds": [[1720, 2960], [1760, 3000]]},
+  {"name": "Fortis Colosseum", "bounds": [[1770, 3090], [1810, 3130]]},
+  {"name": "Outer Fortis", "bounds": [[1600, 3000], [1780, 3140]]},
+  {"name": "Ralos' Rise", "bounds": [[1680, 3060], [1720, 3110]]},
+  {"name": "Sunset Coast", "bounds": [[1250, 2880], [1400, 2970]]},
+  {"name": "Avium Savannah", "bounds": [[1450, 2940], [1620, 3080]]},
+  {"name": "Hunter Guild", "bounds": [[1540, 3030], [1570, 3060]]},
+  {"name": "Aldarin", "bounds": [[1340, 2940], [1420, 3020]]},
+  {"name": "Quetzacalli Gorge", "bounds": [[1350, 3020], [1500, 3120]]},
+  {"name": "Teomat", "bounds": [[1380, 3150], [1460, 3220]]},
+  {"name": "Colossal Wyrm Remains", "bounds": [[1340, 3210], [1440, 3300]]},
+  {"name": "Cam Torum Entrance", "bounds": [[1410, 3210], [1470, 3270]]},
+  {"name": "Auburnvale", "bounds": [[1300, 3310], [1380, 3380]]},
+  {"name": "The Stranglewood", "bounds": [[1100, 3300], [1250, 3460]]},
+  {"name": "Locus Oasis", "bounds": [[1500, 3100], [1570, 3170]]},
+  {"name": "Varlamore Wilds", "bounds": [[1200, 3080], [1350, 3210]]},
+  {"name": "Giants' Plateau", "bounds": [[3340, 3100], [3400, 3180]]}
 ]
